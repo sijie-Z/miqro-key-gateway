@@ -5,9 +5,13 @@ MiQroKey Gateway — 内部凭证治理网关。所有改动按 Goal 汇总；�
 ## [Unreleased] — 截至 2026-09-03（发布候选基线）
 
 ### 2026-09-06
+- **UI 视觉母版 v3（#173，Vben console edition）**：owner 指令把母版从 PostHog 切到 Vben Admin 观感。tokens v2.1（冷画布 #f0f2f5、antd 蓝 #1677ff、深海军蓝导航轨 #001529、hover ≥7%、lg 控件 40px）；NewShell 深色轨 + 分组面包屑（普通页不再重复标题）；UiTable 表头 muted 底 13/600 + 正文 14；登录页 Vben 式左右分屏（#2a5ad7 品牌板 + 白表单列、下划线 tab、44px 控件）；用户页（页头汇总/角色徽标/kebab 控件化）与用量报表（统计卡组/筛选行/Request ID 截断/分页右对齐）结构性打磨；总览页（去空洞欢迎语、统计卡图标徽章、成本分布独立卡、账本空态）。frontend-design.md 修订 v3 段。
+
 - **ADR-0012/0014 Accepted + 留痕 R1 配置面（V31）**：Kafka 引入与内容留痕管道获所有者批准（v3 默认值，P1–P8 已裁决）。V31 新增 `retention_config`（租户级默认关开关，快照下发即时生效）与 `user_identity_link`（平台 OAuth 映射骨架）；管理 API `GET/PUT /api/v1/admin/retention-config`（审计 + 即时刷新）。网关密文采集/信封、Kafka producer、消费端参考实现为后续批次。
 
 - **ADR-0014 R2 网关留痕侧信道**：租户开关开启时，代理请求体的用户消息文本被抽取并以密文信封（envelope: 元数据明文 + AES-GCM 密文载荷，正文仅存在于抽取与加密之间）经有界队列交给 publisher（默认 no-op，fail-closed）；系统提示/工具/模型回复永不在范围；上游字节零改动。测试：抽取矩阵 4 + 端到端 2（开关生效/关闭零采集、上游原样）。
+
+- **ADR-0014 R3 Kafka producer（本批）**：标准 Kafka 协议投递信封到 `content-retention` topic（记录键 = SHA-256(tenant/user)，同用户恒同分区保序）；信封 JSON 只带 base64 AES 密文/IV，明文不出网关；`miqrokey.retention.kafka.bootstrap-servers` 配置后经 @Primary 替换 no-op（默认仍 fail-closed）；发送异步、失败节流计数。测试：payload/partition-key 单测 2 + Redpanda 容器端到端 1（真实 broker 收信、分区亲和、密文语义）。
 ### 2026-09-05
 - **F15 MCP 元数据访问日志（V29）**：MCP 代理（F01）每次身份可解析的调用落一条纯元数据审计行（`mcp_access_log`：租户/服务/消费者/方法/工具/终态/HTTP 状态；网关异步有界队列批量写入、`(tenant, gateway_request_id)` 幂等、饱和 drop+计数）；管理端查询 `GET /api/v1/admin/mcp-access-logs`（service/consumer/窗口 ≤31d/limit≤1000 过滤，SYSTEM_ADMIN-only）。工具参数与响应正文永不入表。
 - **F12/F13 MCP 韧性（V30）**：MCP 代理出口新增**重试门禁与熔断**（均默认关闭；路由快照承载配置，改后即时生效）。重试=首字节前、条件可选（5xx/连接失败/超时）、1–5 次、POST/PUT/PATCH 工具需显式幂等确认；熔断=三态状态机（滑动窗口+最小请求数+错误比例/慢调用双触发+半开探测恢复），按工具桶隔离，OPEN 期间 503 `circuit_open` 快速失败。管理 API `GET/PUT /api/v1/admin/mcp-services/{id}/resilience`；F15 日志新增 `CIRCUIT_OPEN` 终态。腾讯 doc 134831/134859。
