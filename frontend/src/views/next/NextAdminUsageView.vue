@@ -106,7 +106,7 @@ onMounted(load);
     <header class="ui-page-header">
       <div>
         <h1 class="ui-page-title">用量报表</h1>
-        <p class="ui-page-desc">全租户用量：筛选条件 → 汇总 → 明细表。</p>
+        <p class="ui-page-desc">全租户用量：先按条件筛选，再核对汇总与明细。</p>
       </div>
     </header>
 
@@ -121,13 +121,13 @@ onMounted(load);
         <UiInput
           v-model="projectId"
           placeholder="项目 ID（可选）"
-          width="220px"
+          width="200px"
           data-testid="usage-project-id"
         />
         <UiInput
           v-model="modelId"
           placeholder="模型 ID（可选）"
-          width="220px"
+          width="200px"
           data-testid="usage-model-id"
         />
         <UiButton
@@ -145,18 +145,30 @@ onMounted(load);
         class="next-admin-usage__summary"
         data-testid="usage-summary"
       >
-        <span
-          >请求 <b class="ui-num">{{ fmtNum(summary.totals?.requests?.upstream) }}</b></span
-        >
-        <span
-          >输入 tokens <b class="ui-num">{{ fmtNum(summary.totals?.tokens?.input) }}</b></span
-        >
-        <span
-          >输出 tokens <b class="ui-num">{{ fmtNum(summary.totals?.tokens?.output) }}</b></span
-        >
-        <span
-          >上游成本 <b class="ui-num">¥{{ fmtMoney(summary.totals?.cost?.upstreamPaid) }}</b></span
-        >
+        <div class="next-admin-usage__stat">
+          <span class="next-admin-usage__stat-label">请求</span>
+          <span class="next-admin-usage__stat-value ui-num">{{
+            fmtNum(summary.totals?.requests?.upstream)
+          }}</span>
+        </div>
+        <div class="next-admin-usage__stat">
+          <span class="next-admin-usage__stat-label">输入 tokens</span>
+          <span class="next-admin-usage__stat-value ui-num">{{
+            fmtNum(summary.totals?.tokens?.input)
+          }}</span>
+        </div>
+        <div class="next-admin-usage__stat">
+          <span class="next-admin-usage__stat-label">输出 tokens</span>
+          <span class="next-admin-usage__stat-value ui-num">{{
+            fmtNum(summary.totals?.tokens?.output)
+          }}</span>
+        </div>
+        <div class="next-admin-usage__stat">
+          <span class="next-admin-usage__stat-label">上游成本</span>
+          <span class="next-admin-usage__stat-value ui-num"
+            >¥{{ fmtMoney(summary.totals?.cost?.upstreamPaid) }}</span
+          >
+        </div>
       </div>
     </section>
 
@@ -212,7 +224,7 @@ onMounted(load);
           />
         </template>
         <template #gatewayRequestId="{ row }">
-          <span class="ui-mono">{{
+          <span class="ui-mono next-admin-usage__reqid">{{
             (row as UsageRecordPage['items'][number]).gatewayRequestId
           }}</span>
         </template>
@@ -220,6 +232,7 @@ onMounted(load);
     </section>
 
     <div class="next-admin-usage__pager">
+      <span class="next-admin-usage__pager-text">共 {{ records?.total ?? 0 }} 条</span>
       <UiButton
         variant="secondary"
         :disabled="page <= 1"
@@ -228,8 +241,8 @@ onMounted(load);
       >
         上一页
       </UiButton>
-      <span class="ui-num next-admin-usage__pager-text"
-        >第 {{ page }} 页 / 共 {{ records?.total ?? 0 }} 条</span
+      <span class="next-admin-usage__pager-text next-admin-usage__pager-current"
+        >第 {{ page }} 页</span
       >
       <UiButton
         variant="secondary"
@@ -248,21 +261,45 @@ onMounted(load);
   margin-bottom: var(--ui-space-4);
 }
 
+/* keep the filter controls in one tight cluster (no space-between spread) */
 .next-admin-usage__filters :deep(.ui-panel-toolbar) {
   flex-wrap: wrap;
+  justify-content: flex-start;
 }
 
 .next-admin-usage__summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--ui-space-6);
+  padding: var(--ui-space-4) var(--ui-space-5);
+  border-top: 1px solid var(--ui-border-muted);
+}
+
+.next-admin-usage__stat {
   display: flex;
-  flex-wrap: wrap;
-  gap: var(--ui-space-5);
-  padding: var(--ui-space-3) var(--ui-space-5);
-  font-size: var(--ui-font-size-sm);
+  flex-direction: column;
+  gap: var(--ui-space-2);
+}
+
+.next-admin-usage__stat-label {
+  font-size: var(--ui-font-size-xs);
   color: var(--ui-foreground-secondary);
 }
 
-.next-admin-usage__summary b {
+.next-admin-usage__stat-value {
+  font-size: 22px;
+  font-weight: var(--ui-weight-semibold);
   color: var(--ui-foreground);
+  letter-spacing: -0.01em;
+}
+
+.next-admin-usage__reqid {
+  display: inline-block;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: bottom;
 }
 
 .ui-alert {
@@ -280,12 +317,18 @@ onMounted(load);
 .next-admin-usage__pager {
   display: flex;
   align-items: center;
-  gap: var(--ui-space-4);
+  justify-content: flex-end;
+  gap: var(--ui-space-3);
   margin-top: var(--ui-space-4);
 }
 
 .next-admin-usage__pager-text {
-  font-size: var(--ui-font-size-xs);
+  font-size: var(--ui-font-size-sm);
   color: var(--ui-foreground-secondary);
+}
+
+.next-admin-usage__pager-current {
+  color: var(--ui-foreground);
+  font-weight: var(--ui-weight-medium);
 }
 </style>
