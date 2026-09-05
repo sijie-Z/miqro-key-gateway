@@ -1,74 +1,84 @@
-/* MiQroGate UI v2 design tokens — PostHog-derived console language (U0 pilot).
+/* MiQroGate UI v2.1 design tokens — Vben Admin console edition (2026-09-06).
  *
- * Reference master: PostHog product console (github.com/PostHog/posthog, MIT;
- * source material archived in miqro-local/posthog-design-ref/ with extraction
- * notes). Layout/component organization borrows from Vben Admin 5 as a
- * reference only — no code is copied from either project.
+ * Master update (owner round 2026-09-06): the console language moves from the
+ * PostHog warm-paper palette to the Vue Vben Admin console family — cool light
+ * canvas (#f0f2f5), white content surfaces, hairline borders, the antd blue
+ * (#1677ff) single brand color, and a deep-navy navigation rail (#001529).
+ * Layout/component organization follows Vben Admin (github.com/vben-group/
+ * vue-vben-admin + v2.vben.pro demo) as the design master; no code is copied.
  *
- * System: warm near-white canvas, white content surfaces separated by 1px
- * hairlines (no card drop shadows), a single restrained brand blue, muted
- * low-saturation status colors, 4px spacing base, radii control 6 / card 8 /
- * dialog 12, shadows only on popper/dialog/focus rings.
+ * Unchanged product constraints still enforced by the aesthetic audit: no
+ * gradients (brand identity chips and the cost donut aside), no violet outside
+ * the chip palette, regular containers <= 8px radius, shadows only on
+ * popper/dialog/focus rings — this edition adds no new surface shadows.
  *
- * Token vocabulary mirrors PostHog/Quill semantics (background / card / muted /
- * chrome / border / input / ring + -foreground pairs) so both the code and the
- * upstream reference stay comparable. v1 `--miqrokey-*` tokens and their
- * TDesign-era pages are untouched and coexist until each page migrates (U1-U3).
- * The aesthetic audit (aesthetic.spec.ts) gates forbidden patterns on both
- * layers.
+ * Token vocabulary stays on the v2 semantic names (background / card / muted /
+ * chrome / border / input / ring + -foreground pairs) so views and components
+ * do not change; only the tuned values differ. v1 `--miqrokey-*` tokens and
+ * their legacy CSS remain loaded but are consumed by no v2 page.
  */
 :root {
-  /* surfaces — warm neutrals, hue ≈ 75-90, near-zero chroma */
-  --ui-background: #f2f2ee; /* canvas — warm-neutral console ground */
+  /* surfaces — cool neutral console ground (Vben #f0f2f5 family) */
+  --ui-background: #f0f2f5; /* canvas */
   --ui-card: #ffffff;
-  --ui-muted: #efede7; /* subdued rows / secondary fills */
-  --ui-chrome: #ecebe6; /* sidebar / toolbar furniture */
-  --ui-fill-hover: rgba(24, 24, 27, 0.055);
-  --ui-fill-selected: rgba(24, 24, 27, 0.07);
-  --ui-fill-expanded: rgba(24, 24, 27, 0.09);
+  --ui-muted: #f6f7f9; /* subdued rows / secondary fills / table heads */
+  --ui-chrome: #eceef1; /* toolbar furniture */
+  --ui-fill-hover: rgba(26, 30, 38, 0.07);
+  --ui-fill-selected: rgba(26, 30, 38, 0.09);
+  --ui-fill-expanded: rgba(26, 30, 38, 0.12);
 
-  /* text — near-black ink + cool slates (PostHog foreground family) */
-  --ui-foreground: #1d1d1f;
-  --ui-foreground-secondary: #5f5f66;
-  --ui-foreground-faint: #82828b;
+  /* text — cool near-black ink + slate grays */
+  --ui-foreground: #1f2328;
+  --ui-foreground-secondary: #59636e;
+  --ui-foreground-faint: #8c959f;
   --ui-foreground-inverse: #ffffff;
 
   /* lines */
-  --ui-border: #dedcd4; /* hairline default */
-  --ui-border-muted: #ecebe6;
-  --ui-border-strong: #cfccc4;
-  --ui-input-border: #c9c7c0;
+  --ui-border: #dfe3e8; /* hairline default */
+  --ui-border-muted: #eef0f4;
+  --ui-border-strong: #aab2c1;
+  --ui-input-border: #bcc3d1;
 
-  /* brand — single restrained cobalt blue */
-  --ui-primary: #1d4aff;
-  --ui-primary-hover: #1640d6;
-  --ui-primary-active: #1235b8;
-  --ui-primary-soft: #e9edff; /* subtle brand tint fills */
-  --ui-ring: rgba(29, 74, 255, 0.38);
+  /* brand — single antd/Vben blue */
+  --ui-primary: #1677ff;
+  --ui-primary-hover: #4096ff;
+  --ui-primary-active: #0958d9;
+  --ui-primary-soft: #e6f0ff; /* subtle brand tint fills */
+  --ui-ring: rgba(22, 119, 255, 0.35);
 
-  /* status — muted foregrounds on pale backgrounds (Quill light tuples) */
-  --ui-success-fg: #046630;
-  --ui-success-bg: #d5f2de;
+  /* console chrome — deep navy navigation rail (Vben #001529) */
+  --ui-rail: #001529;
+  --ui-rail-text: rgba(255, 255, 255, 0.74);
+  --ui-rail-text-muted: rgba(255, 255, 255, 0.42);
+  --ui-rail-hover: rgba(255, 255, 255, 0.06);
+  --ui-rail-line: rgba(255, 255, 255, 0.09);
+
+  /* login brand panel (Vben login split-screen blue) */
+  --ui-login-panel: #2a5ad7;
+
+  /* status — muted foregrounds on pale backgrounds */
+  --ui-success-fg: #0d6a3d;
+  --ui-success-bg: #d9f2e4;
   --ui-warning-fg: #8a4b00;
   --ui-warning-bg: #f8e8d2;
   --ui-danger-fg: #bd1426;
   --ui-danger-bg: #f9dfdc;
-  --ui-info-fg: #1d4aff;
-  --ui-info-bg: #e9edff;
+  --ui-info-fg: #1677ff;
+  --ui-info-bg: #e6f0ff;
   --ui-neutral-fg: #4e4e55;
   --ui-neutral-bg: #e9e8e2;
 
   /* typography */
   --ui-font:
-    -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', 'PingFang SC', 'Microsoft YaHei',
-    Arial, sans-serif;
-  --ui-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas,
-    monospace;
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', Arial,
+    sans-serif;
+  --ui-font-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
   --ui-font-size-xs: 12px;
   --ui-font-size-sm: 13px;
   --ui-font-size-base: 14px;
   --ui-font-size-lg: 15px;
   --ui-font-size-xl: 18px;
+  --ui-font-size-2xl: 20px;
   --ui-line-height-sm: 18px;
   --ui-line-height-base: 20px;
   --ui-line-height-lg: 24px;
@@ -95,7 +105,7 @@
 
   /* sizes */
   --ui-control-height: 32px;
-  --ui-control-height-lg: 36px;
+  --ui-control-height-lg: 40px;
   --ui-row-height: 48px;
   --ui-table-row-height: 48px;
   --ui-header-height: 56px;

@@ -202,7 +202,7 @@ function cellValue(column: UiTableColumn, row: Record<string, unknown>): unknown
 <style scoped>
 .ui-table {
   width: 100%;
-  font-size: var(--ui-font-size-sm);
+  font-size: var(--ui-font-size-base);
   line-height: var(--ui-line-height-base);
   color: var(--ui-foreground);
 }
@@ -222,11 +222,10 @@ function cellValue(column: UiTableColumn, row: Record<string, unknown>): unknown
   padding: 0 var(--ui-space-3);
   height: var(--ui-row-height);
   border-bottom: 1px solid var(--ui-border);
-  font-size: var(--ui-font-size-xs);
+  font-size: var(--ui-font-size-sm);
   font-weight: var(--ui-weight-semibold);
-  letter-spacing: 0.01em;
-  color: #45454d;
-  background: #f8f7f3;
+  color: var(--ui-foreground);
+  background: var(--ui-muted);
   white-space: nowrap;
 }
 

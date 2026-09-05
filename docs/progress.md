@@ -6,9 +6,18 @@
 
 - Project phase: `PHASE_1`
 - Current executor: `Claude Code`
-- Current goal: `会话执行 2026-09-05（自主长跑轮：Q1-Q3/Q6 收尾/UI 管理面）` — `IN_PROGRESS`（执行与逐批记录见本文件两个「会话交接点 2026-09-05」段；队列总纲仍见 docs/session-handoff-2026-09-05.md）
-- Goal status: `IN_PROGRESS`（2026-09-05；develop @ 2b37af3。本日全量并入：#159 infra/ADR-0013、#160 Q1 契约测试、#161 Q2 F15 日志、#162/#165 codegen stage2（手写类型→生成类型收尾，保留清单与理由已记录）、#163 Q3 F12/F13 韧性、#164 文档 checkpoint、#166 OpenAPI 基线刷新（补齐 #161/#163 契约债）、#167 裁决文档轮（F11/F14 DEFERRED、F10 DONE）、#168 UI 管理面（MCP 访问日志页 + 韧性配置抽屉）。剩：Q4 真机 https 冒烟（测试通道验收路径已交付，真机排后）、Q5 UI 等你真机反馈、Q7 Kafka/F32/发布等拍板、Q6 stage2 残余 spec 缺口项待后端补契约（RoiReportView/route-rules/auth-envelope））
-- Last updated: `2026-09-05 CST`
+- Current goal: `会话执行 2026-09-06（夜间自主轮：UI Vben 母版重塑，分支 goal/ui-vben-2026-09-06）` — `IN_PROGRESS`（本轮记录见下方「会话交接点 2026-09-06」段；队列总纲仍见 docs/session-handoff-2026-09-05.md + NEXT_SESSION_PLAN.md）
+- Goal status: `IN_PROGRESS`（develop @ a867d76 = #172 ADR-0014 R2。2026-09-05→06 已并入：#169 docs 轮、#170 ADR-0012/0014 Accepted + trivyignore、#171 R1 配置面、#172 R2 网关侧信道。**待办：Q4 真机 https 冒烟、Q5 UI（2026-09-06 已按 owner 指令把母版从 PostHog 修订为 Vben Admin console 族，进行中）、R3/R4 Kafka producer/consumer 参考实现（ADR-0014 范围）、Q7 等拍板、Q6 stage2 残余 spec 缺口**）
+- Last updated: `2026-09-06 CST`
+
+## 会话交接点 2026-09-06 — UI 母版修订(Vben console edition)与夜间自主轮
+
+- **owner 指令（2026-09-06）**：UI 仍被评「AI 感、丑」→ 以 Vben Admin（v2.vben.pro demo + vbenjs/vue-vben-admin v5 源码）为视觉母版认真学、照着做；去 GitHub 找 UI skill 借鉴（已取 Anthropic 官方 frontend-design 反模板清单，本地 reference/ui-skills/）；claude-p 继续长跑。
+- **设计决策（分支 goal/ui-vben-2026-09-06）**：v2.1 tokens——画布 #f0f2f5（冷中性）、主色 antd 蓝 #1677ff 族、侧栏深海军蓝 #001529（激活=主色 16% 浅底+白字+左侧 3px #4096ff 竖条，弃实心块——两轮评审共识）、登录页左 #2a5ad7 品牌板（能力三点+标语，无渐变）+ 右白表单列（下划线 tab、44px 控件）；表格表头 muted 底 13px/600、字 14；lg 控件 36→40px（登录局部 44px）；hover 填充 5.5%→7%。视觉评审分（DeepSeek，噪声纪律 ≤2 轮）：login 6.5→7.5、usage 6.5→7.5（r2 噪声回落未追）、home(keys) 7.2、users 7.0（页面级修复已落）。
+- **本批已改（frontend）**：styles/design-tokens.css（v2.1 值重调）、design-base.css（页边 24、页标题 20px）、components/NewShell.vue（navy rail）、ui/Table.vue（表头 chrome）、views/next/NextLoginView.vue（分屏重做）、NextUsersView.vue（汇总进页头、角色徽标、kebab 控件化、单行用户名）、NextAdminUsageView.vue（统计卡组、筛选行紧凑、Request ID 截断、分页右对齐）。
+- **验证（全部真实 PASS）**：typecheck、vitest 154/154、build、eslint（改动文件 0 error）、审美审计。
+- **素材**：vben demo 截图+规格转写与 4 页基线分等全部在 miqro-local/ui-reviews/2026-09-06/ 与 worknotes/。
+- **残余（后续轮）**：NextOverviewView 页级收口、keys 页级（掩码/列宽）、e2e 金样刷新、frontend-design.md 已在本轮修订（见下）视觉基线存档轮。
 ## 会话交接点 2026-09-03 — UI 专项 U0 待验收（用户 2026-09-03 拍板：PostHog 视觉母版 + Vben 布局参考；U0 验收通过前暂停功能 backlog）
 
 ### U0 待办（下一动作，只等用户）

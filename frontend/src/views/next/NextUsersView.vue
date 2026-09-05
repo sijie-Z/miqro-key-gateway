@@ -331,6 +331,9 @@ function formatDate(iso?: string): string {
         <p class="ui-page-desc">管理门户账号与登录权限。</p>
       </div>
       <div class="ui-page-actions">
+        <span class="next-users__summary" data-testid="users-summary"
+          >共 {{ users.length }} 个账号，{{ activeCount }} 个正常</span
+        >
         <UiButton variant="primary" data-testid="user-create-open" @click="creating = !creating">
           {{ creating ? '收起表单' : '创建用户' }}
         </UiButton>
@@ -391,11 +394,6 @@ function formatDate(iso?: string): string {
 
     <!-- List -->
     <section class="ui-panel">
-      <div class="ui-panel-toolbar">
-        <span class="ui-panel-sub" data-testid="users-summary"
-          >共 {{ users.length }} 个账号，{{ activeCount }} 个正常</span
-        >
-      </div>
       <UiTable
         :columns="columns"
         :data="users"
@@ -405,8 +403,8 @@ function formatDate(iso?: string): string {
         data-testid="users-table"
       >
         <template #username="{ row }">
-          <div class="next-users__name">{{ (row as AdminUser).username }}</div>
-          <div
+          <span class="next-users__name">{{ (row as AdminUser).username }}</span>
+          <span
             v-if="
               (row as AdminUser).displayName &&
               (row as AdminUser).displayName !== (row as AdminUser).username
@@ -414,11 +412,17 @@ function formatDate(iso?: string): string {
             class="next-users__display"
           >
             {{ (row as AdminUser).displayName }}
-          </div>
+          </span>
         </template>
-        <template #role="{ row }">{{
-          roleLabel[(row as AdminUser).role] ?? (row as AdminUser).role
-        }}</template>
+        <template #role="{ row }">
+          <span
+            class="next-users__role"
+            :class="{
+              'next-users__role--admin': (row as AdminUser).role === 'SYSTEM_ADMIN',
+            }"
+            >{{ roleLabel[(row as AdminUser).role] ?? (row as AdminUser).role }}</span
+          >
+        </template>
         <template #status="{ row }">
           <UiStatusBadge
             :tone="statusTone((row as AdminUser).status)"
@@ -653,6 +657,12 @@ function formatDate(iso?: string): string {
   grid-column: 1 / -1;
 }
 
+.next-users__summary {
+  font-size: var(--ui-font-size-sm);
+  color: var(--ui-foreground-secondary);
+  white-space: nowrap;
+}
+
 .next-users__head-inline {
   display: flex;
   align-items: baseline;
@@ -665,10 +675,29 @@ function formatDate(iso?: string): string {
 }
 
 .next-users__display {
-  font-size: 11px;
-  line-height: var(--ui-line-height-sm);
+  margin-left: var(--ui-space-2);
+  font-size: var(--ui-font-size-xs);
+  line-height: var(--ui-line-height-lg);
   color: var(--ui-foreground-faint);
-  margin-top: 2px;
+  white-space: nowrap;
+}
+
+.next-users__role {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding: 0 var(--ui-space-2);
+  border-radius: var(--ui-radius-pill);
+  background: var(--ui-muted);
+  color: var(--ui-foreground-secondary);
+  font-size: var(--ui-font-size-xs);
+  line-height: 1;
+}
+
+.next-users__role--admin {
+  background: var(--ui-primary-soft);
+  color: var(--ui-primary-active);
+  font-weight: var(--ui-weight-medium);
 }
 
 .next-users__kebab {
@@ -677,15 +706,19 @@ function formatDate(iso?: string): string {
   justify-content: center;
   width: 28px;
   height: 28px;
-  border: none;
+  border: 1px solid var(--ui-border);
   border-radius: var(--ui-radius-control);
-  background: transparent;
-  color: var(--ui-foreground-faint);
+  background: var(--ui-card);
+  color: var(--ui-foreground-secondary);
   cursor: pointer;
+  transition:
+    border-color var(--ui-ease),
+    color var(--ui-ease),
+    background-color var(--ui-ease);
 }
 
 .next-users__kebab:hover {
-  background: var(--ui-fill-hover);
+  background: var(--ui-muted);
   color: var(--ui-foreground);
 }
 

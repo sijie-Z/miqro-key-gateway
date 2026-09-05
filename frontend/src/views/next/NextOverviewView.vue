@@ -9,6 +9,7 @@ import { computed, onMounted, ref } from 'vue';
 import * as api from '@/api';
 import { ApiError } from '@/api/http';
 import { useAuthStore } from '@/stores/auth';
+import { ChartBarIcon, LayersIcon, LockOnIcon, MoneyIcon } from 'tdesign-icons-vue-next';
 import { UiButton, UiStatusBadge } from '@/ui';
 import type {UsageGroup} from '@/types/api';
 import type { SubscriptionView, VirtualKeyView } from '@/types/generated-api';
@@ -36,10 +37,10 @@ const stats = computed(() => {
     0,
   );
   return [
-    { label: 'Virtual Key', value: String(keys.value.length), hint: `${active} 个可用` },
-    { label: '本月请求', value: formatCount(totalRequests), hint: '经网关的请求数' },
-    { label: '本月 Tokens', value: formatCount(totalTokens), hint: '输入 + 输出' },
-    { label: '本月成本', value: `¥${Number(totalCost).toFixed(2)}`, hint: '按价格快照估算' },
+    { label: 'Virtual Key', value: String(keys.value.length), hint: `${active} 个可用`, icon: LockOnIcon },
+    { label: '本月请求', value: formatCount(totalRequests), hint: '经网关的请求数', icon: ChartBarIcon },
+    { label: '本月 Tokens', value: formatCount(totalTokens), hint: '输入 + 输出', icon: LayersIcon },
+    { label: '本月成本', value: `¥${Number(totalCost).toFixed(2)}`, hint: '按价格快照估算', icon: MoneyIcon },
   ];
 });
 
@@ -134,16 +135,16 @@ onMounted(load);
   <div class="ui-page next-overview">
     <header class="ui-page-header">
       <div>
-        <h1 class="ui-page-title">{{ auth.user?.displayName ?? auth.user?.username }}，欢迎回来</h1>
+        <h1 class="ui-page-title">总览</h1>
         <p class="ui-page-desc">
-          内部凭证治理控制台 · 单租户部署 · {{ new Date().getFullYear() }} 年
+          Virtual Key、用量与成本的关键指标——数据来自网关逐笔记账，与明细页口径一致。
         </p>
       </div>
       <div class="ui-page-actions">
         <UiButton
           variant="primary"
           data-testid="overview-create-key"
-          @click="$router.push('/app-new/keys')"
+          @click="$router.push('/app/keys')"
         >
           创建 Virtual Key
         </UiButton>
@@ -168,9 +169,14 @@ onMounted(load);
       <section class="ui-panel next-overview__panel" data-testid="overview-stats">
         <div class="next-overview__stat-band">
           <div v-for="card in stats" :key="card.label" class="next-overview__stat">
-            <span class="next-overview__stat-label">{{ card.label }}</span>
-            <span class="next-overview__stat-value ui-num">{{ card.value }}</span>
-            <span class="next-overview__stat-hint">{{ card.hint }}</span>
+            <div class="next-overview__stat-main">
+              <span class="next-overview__stat-label">{{ card.label }}</span>
+              <span class="next-overview__stat-value ui-num">{{ card.value }}</span>
+              <span class="next-overview__stat-hint">{{ card.hint }}</span>
+            </div>
+            <span class="next-overview__stat-icon" aria-hidden="true">
+              <component :is="card.icon" />
+            </span>
           </div>
         </div>
       </section>
@@ -180,7 +186,7 @@ onMounted(load);
         <section class="ui-panel" data-testid="overview-usage">
           <div class="ui-panel-head">
             <h2 class="ui-panel-title">用量分布（按项目）</h2>
-            <router-link to="/app-new/usage" class="next-overview__link">查看明细</router-link>
+            <router-link to="/app/usage" class="next-overview__link">查看明细</router-link>
           </div>
           <div class="ui-panel-body">
             <div v-if="usageBars.length" class="next-overview__bars">
@@ -198,37 +204,13 @@ onMounted(load);
             <p v-else class="next-overview__empty">
               还没有用量记录。创建 Key 并开始调用后，这里会出现用量分布。
             </p>
-
-            <template v-if="costGroups.length">
-              <div class="next-overview__cost-head">
-                <h3 class="next-overview__sub-title">成本分布</h3>
-                <span class="ui-panel-sub">上游实付 · ¥{{ costTotal.toFixed(2) }}</span>
-              </div>
-              <div class="next-overview__cost-grid">
-                <div v-for="group in costGroups" :key="group.label" class="next-overview__cost-row">
-                  <span class="next-overview__cost-label" :title="group.label">{{
-                    group.label
-                  }}</span>
-                  <div class="next-overview__cost-track">
-                    <div
-                      class="next-overview__cost-fill"
-                      :style="{ width: `${Math.max(2, (group.cost / (costTotal || 1)) * 100)}%` }"
-                    />
-                  </div>
-                  <span class="next-overview__cost-value ui-num"
-                    >¥{{ group.cost.toFixed(2) }} ·
-                    {{ ((group.cost / (costTotal || 1)) * 100).toFixed(0) }}%</span
-                  >
-                </div>
-              </div>
-            </template>
           </div>
         </section>
 
         <section class="ui-panel" data-testid="overview-keys">
           <div class="ui-panel-head">
             <h2 class="ui-panel-title">最近创建的 Key</h2>
-            <router-link to="/app-new/keys" class="next-overview__link">全部 Key</router-link>
+            <router-link to="/app/keys" class="next-overview__link">全部 Key</router-link>
           </div>
           <div v-if="recentKeys.length" class="next-overview__recent">
             <div v-for="key in recentKeys" :key="key.id" class="next-overview__key-row">
@@ -260,10 +242,37 @@ onMounted(load);
           </div>
           <div v-else class="next-overview__recent-empty">
             <p class="next-overview__empty">还没有 Virtual Key。</p>
-            <router-link to="/app-new/keys" class="next-overview__link">创建一个</router-link>
+            <router-link to="/app/keys" class="next-overview__link">创建一个</router-link>
           </div>
         </section>
       </div>
+
+      <!-- Cost distribution (full-width panel; ties usage numbers to money) -->
+      <section v-if="costGroups.length" class="ui-panel next-overview__panel" data-testid="overview-cost">
+        <div class="ui-panel-head">
+          <h2 class="ui-panel-title">成本分布（按项目）</h2>
+          <span class="ui-panel-sub">上游实付合计 · ¥{{ costTotal.toFixed(2) }}</span>
+        </div>
+        <div class="ui-panel-body">
+          <div class="next-overview__cost-grid">
+            <div v-for="group in costGroups" :key="group.label" class="next-overview__cost-row">
+              <span class="next-overview__cost-label" :title="group.label">{{
+                group.label
+              }}</span>
+              <div class="next-overview__cost-track">
+                <div
+                  class="next-overview__cost-fill"
+                  :style="{ width: `${Math.max(2, (group.cost / (costTotal || 1)) * 100)}%` }"
+                />
+              </div>
+              <span class="next-overview__cost-value ui-num"
+                >¥{{ group.cost.toFixed(2) }} ·
+                {{ ((group.cost / (costTotal || 1)) * 100).toFixed(0) }}%</span
+              >
+            </div>
+          </div>
+        </div>
+      </section>
 
       <!-- Admin quota ledger -->
       <section v-if="isAdmin" class="ui-panel next-overview__panel" data-testid="overview-ledger">
@@ -280,21 +289,24 @@ onMounted(load);
               <span class="ui-panel-sub">{{ row.productName }} · {{ row.planScope }}</span>
             </div>
             <div class="next-overview__ledger-band">
-              <div v-for="seg in row.segments" :key="seg.label" class="next-overview__ledger-seg">
-                <span class="next-overview__ledger-seg-label"
-                  >{{ seg.label }} · {{ Math.round(seg.ratio * 100) }}%</span
-                >
-                <div class="next-overview__ledger-track">
-                  <div
-                    class="next-overview__ledger-fill"
-                    :class="{
-                      'next-overview__ledger-fill--warn': seg.ratio >= 0.6 && seg.ratio < 0.8,
-                      'next-overview__ledger-fill--danger': seg.ratio >= 0.8,
-                    }"
-                    :style="{ width: `${Math.round(seg.ratio * 100)}%` }"
-                  />
+              <template v-if="row.quotaTotal">
+                <div v-for="seg in row.segments" :key="seg.label" class="next-overview__ledger-seg">
+                  <span class="next-overview__ledger-seg-label"
+                    >{{ seg.label }} · {{ Math.round(seg.ratio * 100) }}%</span
+                  >
+                  <div class="next-overview__ledger-track">
+                    <div
+                      class="next-overview__ledger-fill"
+                      :class="{
+                        'next-overview__ledger-fill--warn': seg.ratio >= 0.6 && seg.ratio < 0.8,
+                        'next-overview__ledger-fill--danger': seg.ratio >= 0.8,
+                      }"
+                      :style="{ width: `${Math.round(seg.ratio * 100)}%` }"
+                    />
+                  </div>
                 </div>
-              </div>
+              </template>
+              <span v-else class="next-overview__ledger-unset">未配置滚动额度</span>
             </div>
             <span class="next-overview__ledger-quota ui-num">{{
               row.quotaTotal ? `${formatCount(row.quotaTotal)} ${row.quotaUnit}` : '—'
@@ -336,9 +348,10 @@ onMounted(load);
 
 .next-overview__stat {
   display: flex;
-  flex-direction: column;
-  gap: var(--ui-space-1);
-  padding: var(--ui-space-1) var(--ui-space-2);
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--ui-space-3);
+  padding: var(--ui-space-2) var(--ui-space-4) var(--ui-space-2) var(--ui-space-2);
   border-right: 1px solid var(--ui-border-muted);
 }
 
@@ -346,20 +359,46 @@ onMounted(load);
   border-right: none;
 }
 
+.next-overview__stat-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-1);
+  min-width: 0;
+}
+
 .next-overview__stat-label {
   font-size: var(--ui-font-size-xs);
   color: var(--ui-foreground-secondary);
+  white-space: nowrap;
 }
 
 .next-overview__stat-value {
   font-size: 24px;
   font-weight: var(--ui-weight-semibold);
   letter-spacing: -0.01em;
+  white-space: nowrap;
 }
 
 .next-overview__stat-hint {
   font-size: 11px;
   color: var(--ui-foreground-faint);
+}
+
+.next-overview__stat-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--ui-radius-panel);
+  background: var(--ui-primary-soft);
+  color: var(--ui-primary-active);
+  flex-shrink: 0;
+}
+
+.next-overview__stat-icon svg {
+  width: 17px;
+  height: 17px;
 }
 
 .next-overview__stat-skeleton {
@@ -400,7 +439,7 @@ onMounted(load);
 
 .next-overview__bar-row {
   display: grid;
-  grid-template-columns: 120px 1fr 64px;
+  grid-template-columns: minmax(110px, 160px) 1fr 72px;
   align-items: center;
   gap: var(--ui-space-3);
   font-size: var(--ui-font-size-xs);
@@ -435,8 +474,6 @@ onMounted(load);
   display: flex;
   align-items: baseline;
   gap: var(--ui-space-3);
-  padding-top: var(--ui-space-4);
-  border-top: 1px solid var(--ui-border-muted);
   margin-bottom: var(--ui-space-3);
 }
 
@@ -454,7 +491,7 @@ onMounted(load);
 
 .next-overview__cost-row {
   display: grid;
-  grid-template-columns: 120px 1fr 130px;
+  grid-template-columns: minmax(140px, 200px) 1fr 140px;
   align-items: center;
   gap: var(--ui-space-3);
   font-size: var(--ui-font-size-xs);
@@ -521,6 +558,15 @@ onMounted(load);
   font-size: 11px;
   color: var(--ui-foreground-faint);
   margin-top: 2px;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.next-overview__ledger-unset {
+  font-size: var(--ui-font-size-xs);
+  color: var(--ui-foreground-faint);
 }
 
 .next-overview__recent-empty {
