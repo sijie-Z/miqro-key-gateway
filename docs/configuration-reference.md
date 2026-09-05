@@ -183,6 +183,8 @@ F15 MCP 访问日志队列（网关数据面）：`miqrokey.gateway.mcp-log.capa
 
 合规留痕侧信道（ADR-0014，默认全关——除 retention_config 开关外无任何采集）：`miqrokey.retention.capacity`（默认 512，`MIQROKEY_RETENTION_CAPACITY`）、`miqrokey.retention.flush-interval-ms`（默认 1000，`MIQROKEY_RETENTION_FLUSH_INTERVAL_MS`）、`miqrokey.retention.max-text-chars`（默认 100000，`MIQROKEY_RETENTION_MAX_TEXT_CHARS`，单请求用户文本上限，超限跳过+计数）。采集面由控制面 `retention_config`（管理 API §5.26）逐租户开关并经路由快照下发；无 crypto 或 publisher 时 fail-closed。
 
+**R3 Kafka 出口（ADR-0014，默认关）**：`miqrokey.retention.kafka.bootstrap-servers`（默认空=不启用，`MIQROKEY_RETENTION_KAFKA_BOOTSTRAP_SERVERS`；配置后替换 no-op publisher 为真实投递，topic 默认 `content-retention`）、`miqrokey.retention.kafka.topic`（`MIQROKEY_RETENTION_KAFKA_TOPIC`）、`miqrokey.retention.kafka.client-id`（默认 `miqrokey-gateway-retention`，`MIQROKEY_RETENTION_KAFKA_CLIENT_ID`）。记录键 = SHA-256(tenant/user)，同用户恒落同分区；信封 JSON 携带 AES 密文（base64），明文永不出网关；发送异步、失败节流计数（消费者按 eventId 幂等容忍重放）。
+
 ## 7. Webhook 与告警
 
 | 配置 | 默认 | 说明 |
