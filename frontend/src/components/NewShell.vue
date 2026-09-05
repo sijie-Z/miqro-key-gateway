@@ -244,8 +244,8 @@ async function handleLogout() {
   flex-direction: column;
   width: var(--ui-sidebar-width);
   flex-shrink: 0;
-  background: #fbfaf7;
-  border-right: 1px solid var(--ui-border);
+  background: var(--ui-rail);
+  border-right: 1px solid var(--ui-rail-line);
   transition: width var(--ui-ease);
 }
 
@@ -259,7 +259,7 @@ async function handleLogout() {
   gap: var(--ui-space-2);
   height: var(--ui-header-height);
   padding: 0 var(--ui-space-5);
-  border-bottom: 1px solid var(--ui-border);
+  border-bottom: 1px solid var(--ui-rail-line);
 }
 
 .new-shell__rail--icons .new-shell__brand {
@@ -284,6 +284,7 @@ async function handleLogout() {
   font-size: var(--ui-font-size-base);
   font-weight: var(--ui-weight-semibold);
   letter-spacing: -0.01em;
+  color: var(--ui-foreground-inverse);
 }
 
 .new-shell__nav {
@@ -306,7 +307,7 @@ async function handleLogout() {
   font-weight: var(--ui-weight-semibold);
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  color: #76767e;
+  color: var(--ui-rail-text-muted);
 }
 
 .new-shell__nav-item {
@@ -317,7 +318,7 @@ async function handleLogout() {
   height: 34px;
   padding: 0 var(--ui-space-2);
   border-radius: var(--ui-radius-control);
-  color: var(--ui-foreground-secondary);
+  color: var(--ui-rail-text);
   font-size: var(--ui-font-size-sm);
   text-decoration: none;
   transition:
@@ -331,8 +332,8 @@ async function handleLogout() {
 }
 
 .new-shell__nav-item:hover {
-  background: var(--ui-fill-hover);
-  color: var(--ui-foreground);
+  background: var(--ui-rail-hover);
+  color: var(--ui-foreground-inverse);
 }
 
 .new-shell__nav-accent {
@@ -347,28 +348,37 @@ async function handleLogout() {
 }
 
 .new-shell__nav-item--active {
-  background: rgba(29, 74, 255, 0.1);
-  color: var(--ui-primary);
+  background: rgba(22, 119, 255, 0.16);
+  color: var(--ui-foreground-inverse);
   font-weight: var(--ui-weight-semibold);
 }
 
+.new-shell__nav-item--active:hover {
+  background: rgba(22, 119, 255, 0.22);
+  color: var(--ui-foreground-inverse);
+}
+
 .new-shell__nav-item--active .new-shell__nav-accent {
-  background: var(--ui-primary);
+  background: var(--ui-primary-hover);
 }
 
 .new-shell__nav-icon {
   width: 18px;
   height: 18px;
-  color: var(--ui-foreground-faint);
+  color: var(--ui-rail-text-muted);
   flex-shrink: 0;
 }
 
+.new-shell__nav-item:hover .new-shell__nav-icon {
+  color: var(--ui-foreground-inverse);
+}
+
 .new-shell__nav-item--active .new-shell__nav-icon {
-  color: var(--ui-primary);
+  color: var(--ui-foreground-inverse);
 }
 
 .new-shell__rail-foot {
-  border-top: 1px solid var(--ui-border);
+  border-top: 1px solid var(--ui-rail-line);
   padding: var(--ui-space-3) var(--ui-space-5);
 }
 
@@ -379,7 +389,7 @@ async function handleLogout() {
 .new-shell__version {
   margin: 0;
   font-size: var(--ui-font-size-xs);
-  color: var(--ui-foreground-faint);
+  color: var(--ui-rail-text-muted);
   letter-spacing: 0.02em;
 }
 
@@ -411,7 +421,7 @@ async function handleLogout() {
 
 .new-shell__breadcrumb {
   font-size: var(--ui-font-size-sm);
-  color: var(--ui-foreground-faint);
+  color: var(--ui-foreground-secondary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;

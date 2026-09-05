@@ -1,11 +1,13 @@
 <script setup lang="ts">
 /**
- * NextLoginView — /login-new pilot page (UI U0, PostHog language).
- * Login / register dual-mode card over warm paper canvas. Logic mirrors the
- * legacy LoginView (register-and-enter, redirect query, error envelope).
+ * NextLoginView — /login page (Vben Admin console edition, 2026-09-06).
+ * Split-screen login: deep-blue brand panel + white form column. Login /
+ * register dual mode. Logic mirrors the legacy LoginView (register-and-enter,
+ * redirect query, error envelope). Visual master: v2.vben.pro login screen.
  */
 import { ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { ChartBarIcon, LockOnIcon, NotificationIcon } from 'tdesign-icons-vue-next';
 import { ApiError } from '@/api/http';
 import { useAuthStore } from '@/stores/auth';
 import { UiButton, UiInput } from '@/ui';
@@ -96,16 +98,37 @@ function renderError(error: unknown, fallback: string) {
 
 <template>
   <div class="next-login">
-    <main class="next-login__side">
-      <section class="next-login__card" data-testid="login-panel">
-        <header class="next-login__head">
-          <div class="next-login__mark" aria-hidden="true">M</div>
-          <h1 class="next-login__title">{{ mode === 'login' ? '登录 MiQroGate' : '创建账号' }}</h1>
-          <p class="next-login__subtitle">
-            {{ mode === 'login' ? '使用门户账号进入控制台。' : '注册后立即可用，无需审核。' }}
+    <aside class="next-login__brand" aria-hidden="true">
+      <div class="next-login__brand-top">
+        <span class="next-login__brand-mark">M</span>
+        <span class="next-login__brand-name">MiQroGate</span>
+      </div>
+      <div class="next-login__brand-body">
+        <ul class="next-login__brand-features" aria-hidden="true">
+          <li class="next-login__brand-feature">
+            <LockOnIcon class="next-login__brand-icon" />
+            <span>上游密钥加密存放，目录签名后下发</span>
+          </li>
+          <li class="next-login__brand-feature">
+            <ChartBarIcon class="next-login__brand-icon" />
+            <span>每次调用按 Key 记账，用量成本可追溯</span>
+          </li>
+          <li class="next-login__brand-feature">
+            <NotificationIcon class="next-login__brand-icon" />
+            <span>配额与预算只告警，从不悄悄截断</span>
+          </li>
+        </ul>
+        <div class="next-login__brand-bottom">
+          <p class="next-login__brand-title">企业内 AI 编码流量的凭证与用量治理</p>
+          <p class="next-login__brand-desc">
+            MiQroKey Gateway · 一次签发、处处留痕；把上游密钥和每一分用量管在看得见的地方。
           </p>
-        </header>
+        </div>
+      </div>
+    </aside>
 
+    <main class="next-login__form-side" data-testid="login-panel">
+      <section class="next-login__form-col">
         <div class="next-login__tabs" role="tablist" aria-label="登录或注册">
           <button
             type="button"
@@ -126,6 +149,13 @@ function renderError(error: unknown, fallback: string) {
             注册
           </button>
         </div>
+
+        <header class="next-login__head">
+          <h1 class="next-login__title">{{ mode === 'login' ? '登录 MiQroGate' : '创建账号' }}</h1>
+          <p class="next-login__subtitle">
+            {{ mode === 'login' ? '使用门户账号进入控制台。' : '注册后立即可用，无需审核。' }}
+          </p>
+        </header>
 
         <div v-if="errorMessage" class="next-login__error" role="alert" data-testid="login-error">
           {{ errorMessage
@@ -238,94 +268,145 @@ function renderError(error: unknown, fallback: string) {
             {{ mode === 'login' ? '登录' : '注册并进入' }}
           </UiButton>
         </form>
+        <p class="next-login__foot">MiQroGate · 内部 AI 编码流量凭证治理网关</p>
       </section>
-      <p class="next-login__foot">MiQroGate · 内部 AI 编码流量凭证治理网关</p>
     </main>
   </div>
 </template>
 
 <style scoped>
 .next-login {
+  display: grid;
+  grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
   min-height: 100vh;
-  display: flex;
-  background: var(--ui-background);
   color: var(--ui-foreground);
 }
 
-.next-login__side {
-  flex: 1;
+/* ---- brand panel ---- */
+.next-login__brand {
+  position: relative;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
+  padding: var(--ui-space-8) var(--ui-space-10) var(--ui-space-10);
+  background: var(--ui-login-panel);
+  color: var(--ui-foreground-inverse);
+}
+
+.next-login__brand-top {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  padding: var(--ui-space-8) var(--ui-space-4);
+  gap: var(--ui-space-3);
 }
 
-.next-login__card {
-  width: min(460px, 100%);
-  padding: 44px 44px 40px;
-  background: var(--ui-card);
-  border: 1px solid var(--ui-border);
-  border-radius: var(--ui-radius-dialog);
-  box-shadow: var(--ui-shadow-dialog);
-}
-
-.next-login__head {
-  text-align: center;
-  margin-bottom: var(--ui-space-8);
-}
-
-.next-login__mark {
+.next-login__brand-mark {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
+  width: 34px;
+  height: 34px;
   border-radius: var(--ui-radius-control);
-  background: var(--ui-primary);
-  color: #fff;
-  font-size: 21px;
+  background: var(--ui-card);
+  color: var(--ui-primary);
+  font-size: 18px;
   font-weight: 700;
-  margin-bottom: var(--ui-space-5);
 }
 
-.next-login__title {
-  margin: 0;
-  font-size: 21px;
+.next-login__brand-name {
+  font-size: var(--ui-font-size-xl);
   font-weight: var(--ui-weight-semibold);
   letter-spacing: -0.01em;
 }
 
-.next-login__subtitle {
-  margin: var(--ui-space-2) 0 0;
-  font-size: 14px;
-  color: #56565e;
+.next-login__brand-body {
+  margin: auto 0;
+  max-width: 440px;
+}
+
+.next-login__brand-features {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ui-space-4);
+}
+
+.next-login__brand-feature {
+  display: flex;
+  align-items: center;
+  gap: var(--ui-space-3);
+  font-size: var(--ui-font-size-sm);
+  line-height: var(--ui-line-height-base);
+  color: rgba(255, 255, 255, 0.78);
+}
+
+.next-login__brand-icon {
+  width: 16px;
+  height: 16px;
+  color: rgba(255, 255, 255, 0.92);
+  flex-shrink: 0;
+  display: block;
+}
+
+.next-login__brand-bottom {
+  margin-top: var(--ui-space-6);
+  padding-top: var(--ui-space-6);
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+}
+
+.next-login__brand-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: var(--ui-weight-semibold);
+  line-height: 1.55;
+  letter-spacing: -0.01em;
+}
+
+.next-login__brand-desc {
+  margin: var(--ui-space-3) 0 0;
+  font-size: var(--ui-font-size-sm);
+  line-height: 1.9;
+  color: rgba(255, 255, 255, 0.68);
+}
+
+/* ---- form column ---- */
+.next-login__form-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: var(--ui-card);
+  padding: var(--ui-space-8) var(--ui-space-6);
+}
+
+.next-login__form-col {
+  width: min(400px, 100%);
+  display: flex;
+  flex-direction: column;
 }
 
 .next-login__tabs {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--ui-space-1);
-  padding: var(--ui-space-1);
-  background: var(--ui-muted);
-  border: 1px solid var(--ui-border-muted);
-  border-radius: var(--ui-radius-control);
-  margin-bottom: var(--ui-space-6);
+  display: flex;
+  align-self: stretch;
+  gap: var(--ui-space-5);
+  margin-bottom: var(--ui-space-8);
 }
 
 .next-login__tab {
   border: 0;
-  height: 34px;
-  border-radius: calc(var(--ui-radius-control) - 2px);
-  font-size: var(--ui-font-size-sm);
+  height: 40px;
+  padding: 0 2px;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  font-size: var(--ui-font-size-base);
   font-weight: var(--ui-weight-medium);
   color: var(--ui-foreground-secondary);
-  background: transparent;
   cursor: pointer;
   transition:
     color var(--ui-ease),
-    background-color var(--ui-ease),
-    box-shadow var(--ui-ease);
+    border-color var(--ui-ease);
 }
 
 .next-login__tab:hover {
@@ -333,19 +414,37 @@ function renderError(error: unknown, fallback: string) {
 }
 
 .next-login__tab--active {
-  background: var(--ui-card);
-  border: 1px solid var(--ui-border);
+  border-bottom-color: var(--ui-primary);
   color: var(--ui-primary);
   font-weight: var(--ui-weight-semibold);
 }
 
 .next-login__tab--active:hover {
-  color: var(--ui-primary);
+  color: var(--ui-primary-active);
 }
 
 .next-login__tab:focus-visible {
   outline: none;
   box-shadow: var(--ui-shadow-focus);
+}
+
+.next-login__head {
+  margin-bottom: var(--ui-space-5);
+}
+
+.next-login__title {
+  margin: 0;
+  font-size: 26px;
+  font-weight: var(--ui-weight-semibold);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.next-login__subtitle {
+  margin: var(--ui-space-2) 0 0;
+  font-size: var(--ui-font-size-base);
+  line-height: var(--ui-line-height-base);
+  color: var(--ui-foreground-secondary);
 }
 
 .next-login__error {
@@ -361,19 +460,38 @@ function renderError(error: unknown, fallback: string) {
 .next-login__form {
   display: flex;
   flex-direction: column;
-  gap: var(--ui-space-6);
+  gap: var(--ui-space-5);
 }
 
 .next-login__form :deep(.ui-field) {
   gap: var(--ui-space-2);
 }
 
+.next-login__form :deep(.ui-field__label) {
+  font-size: var(--ui-font-size-base);
+}
+
+/* login screen controls sit taller than in-console controls (44px) */
+.next-login__form :deep(.ui-field--large .ui-field__input) {
+  height: 44px;
+}
+
+.next-login__form :deep(.ui-field--large .ui-field__suffix) {
+  height: 44px;
+}
+
+.next-login__submit {
+  width: 100%;
+  height: 44px;
+  margin-top: var(--ui-space-2);
+}
+
 .next-login__eye {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 34px;
+  height: 34px;
   border: none;
   border-radius: var(--ui-radius-control);
   background: transparent;
@@ -391,15 +509,25 @@ function renderError(error: unknown, fallback: string) {
   box-shadow: var(--ui-shadow-focus);
 }
 
-.next-login__submit {
-  width: 100%;
-  margin-top: var(--ui-space-3);
-}
-
 .next-login__foot {
   margin: var(--ui-space-6) 0 0;
-  font-size: var(--ui-font-size-xs);
+  font-size: var(--ui-font-size-sm);
   color: var(--ui-foreground-faint);
   text-align: center;
+}
+
+/* ---- responsive: brand panel yields to a single centered column ---- */
+@media (max-width: 959px) {
+  .next-login {
+    grid-template-columns: 1fr;
+  }
+
+  .next-login__brand {
+    display: none;
+  }
+
+  .next-login__form-side {
+    padding: var(--ui-space-10) var(--ui-space-6);
+  }
 }
 </style>
