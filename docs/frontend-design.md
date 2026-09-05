@@ -1,4 +1,36 @@
 # 前端视觉设计规范
+
+## 视觉母版 v3 — Vben Admin console edition（2026-09-06，现行）
+
+> owner 轮换指令（2026-09-06）：现有界面仍被评为「AI 感、不好看」，视觉母版从
+> PostHog（v2）切换到 **Vue Vben Admin**（官方 demo `v2.vben.pro` 与源码仓库
+> `vbenjs/vue-vben-admin`）——认真学其布局/组件组织与观感，不复制代码与资产。
+> UI skill 借鉴：Anthropic 官方 `frontend-design` 反模板清单（本会话 local
+> reference/ui-skills/）。**token 权威源 = `frontend/src/styles/design-tokens.css`（v2.1 `--ui-*`）+ `design-base.css`；本文件只记方向与验收。**
+
+- **分层签名**：内容画布 `#f0f2f5` 冷灰、白卡/白表浮于画布（发丝边、无卡片阴影）、
+  深海军蓝导航轨 `#001529`（240px；激活项=主色 16% 浅底 + 白字 + 左侧 3px
+  `#4096ff` 竖条；hover 白 6%）。
+- **颜色**：单主色 antd/Vben 蓝 `#1677ff`（hover `#4096ff` / active `#0958d9` /
+  soft `#e6f0ff` / ring 35%）；hairline `#dfe3e8`；input `#bcc3d1`；正文 `#1f2328`
+  / 次级 `#59636e` / 弱 `#8c959f`；登录品牌板 `#2a5ad7`；状态色沿用 muted 成对
+  fg/bg（success/warning/danger/info/neutral）。
+- **几何**：顶栏 56、页内容边距 24、页标题 20px/600 + 描述 14 次级；控件高 32
+  （页内主导 40、登录 44）圆角 6；表头 muted 底 13px/600、行 48px、字 14、行
+  hover 7% 灰、数字列右对齐 tabular；分页右对齐（共 N 条 / 上页 / 第 N 页 / 下页）；
+  表单面板同卡带 hairline；导航分组标题 11px 白 42% 大写。
+- **登录页**：左右分屏 58/42——左 `#2a5ad7` 品牌板（Logo+三条能力点+标题 24/副题
+  13 白 68%，能力区垂直居中，整版无渐变、无插画）；右白表单列 400px（下划线式
+  登录/注册 tab、label 14、44px 输入与主按钮、密码眼睛、错误条、底部 hairline
+  品牌脚注）。960px 以下隐藏左板单栏居中。
+- **不变纪律（仍由 aesthetic audit 强制）**：零渐变（品牌 chip 与成本 donut 例外）、
+  无紫色、普通容器 radius≤8、阴影仅 popper/dialog/focus；全中文文案、focus-visible
+  可见、hover/focus 反馈必须在实机可感知（fill ≥7%）。
+- 历史母版（v2 PostHog 暖纸 2026-08-27→09-03、v1 腾讯 TokenHub 密集账本
+  2026-08-27）见下文各段，仅作追溯，不再作为现行约束。
+
+---
+
 ## 视觉方向（2026-08-27，v2）
 
 参考腾讯云 TokenHub 控制台（https://console.cloud.tencent.com/tokenhub）的浅色密集操作台：
