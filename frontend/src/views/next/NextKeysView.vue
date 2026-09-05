@@ -527,7 +527,7 @@ function statusTone(status: string): 'success' | 'warning' | 'danger' | 'neutral
         </div>
         <UiInput
           v-model="keyFilter"
-          placeholder="按名称 / 项目 / Key 前缀过滤"
+          placeholder="按名称、项目或 Key 前缀过滤"
           width="240px"
           data-testid="keys-filter"
         />
