@@ -45,17 +45,17 @@
             <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
 
+        <!-- Reactor Netty (managed by Spring Boot) -->
+        <dependency>
+            <groupId>io.projectreactor.netty</groupId>
+            <artifactId>reactor-netty-http</artifactId>
+        </dependency>
+
         <!-- Kafka client for the ADR-0014 R3 retention publisher (standard
              protocol; version managed by the Spring Boot BOM) -->
         <dependency>
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>
-        </dependency>
-
-        <!-- Reactor Netty (managed by Spring Boot) -->
-        <dependency>
-            <groupId>io.projectreactor.netty</groupId>
-            <artifactId>reactor-netty-http</artifactId>
         </dependency>
 
         <!-- Actuator for health checks and metrics -->
