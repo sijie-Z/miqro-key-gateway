@@ -6,6 +6,7 @@ import com.miqroera.miqrokey.domain.crypto.VirtualKeyCrypto;
 import com.miqroera.miqrokey.domain.crypto.VirtualKeyMaterial;
 import com.miqroera.miqrokey.domain.crypto.impl.HmacVirtualKeyProvider;
 import com.miqroera.miqrokey.domain.model.McpResiliencePolicy;
+import com.miqroera.miqrokey.domain.model.RetentionConfig;
 import com.miqroera.miqrokey.domain.route.RouteSnapshot;
 
 import java.nio.charset.StandardCharsets;
@@ -164,6 +165,12 @@ public final class GatewayTestKeys {
      */
     public static RouteSnapshot snapshotWithResilience(String baseUrl, Map<String, McpResiliencePolicy> policies,
             KeyFixture... keys) {
+        return snapshotWithRetention(baseUrl, policies, Map.of(), keys);
+    }
+
+    /** Fixture snapshot with a retention switch (ADR-0014) keyed by tenant. */
+    public static RouteSnapshot snapshotWithRetention(String baseUrl, Map<String, McpResiliencePolicy> policies,
+            Map<UUID, RetentionConfig> retentionByTenant, KeyFixture... keys) {
         Map<String, RouteSnapshot.KeyRecord> keyMap = new LinkedHashMap<>();
         Map<UUID, RouteSnapshot.BindingRecord> bindingMap = new LinkedHashMap<>();
         Map<UUID, RouteSnapshot.CredentialRecord> credentialMap = new LinkedHashMap<>();
@@ -187,7 +194,7 @@ public final class GatewayTestKeys {
         }
         return new RouteSnapshot(1, Instant.EPOCH, keyMap, bindingMap, credentialMap, modelsMap, grantModelsMap,
                 upstreamModelsMap, productCodesMap, providerIdsMap, mcpConsumers(), mcpServices(baseUrl, policies),
-                Map.of());
+                retentionByTenant);
     }
 
     // ------------------------------------------------------------------

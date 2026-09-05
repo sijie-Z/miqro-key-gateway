@@ -181,6 +181,8 @@ Gateway 使用版本化只读路由快照 + 有界用量写入队列（G2.2/G2.4
 
 F15 MCP 访问日志队列（网关数据面）：`miqrokey.gateway.mcp-log.capacity`（默认 4096，`MIQROKEY_GATEWAY_MCP_LOG_CAPACITY`）、`miqrokey.gateway.mcp-log.flush-interval-ms`（默认 1000，`MIQROKEY_GATEWAY_MCP_LOG_FLUSH_INTERVAL_MS`）。语义同 usage 队列：饱和 drop+WARN 计数、批量写失败整批重入队（`(tenant_id, gateway_request_id)` 幂等保证重试不双写）；`miqrokey.gateway.persistence.enabled=false`（默认）时日志为 no-op（不产行），与 usage 持久化同一开关。
 
+合规留痕侧信道（ADR-0014，默认全关——除 retention_config 开关外无任何采集）：`miqrokey.retention.capacity`（默认 512，`MIQROKEY_RETENTION_CAPACITY`）、`miqrokey.retention.flush-interval-ms`（默认 1000，`MIQROKEY_RETENTION_FLUSH_INTERVAL_MS`）、`miqrokey.retention.max-text-chars`（默认 100000，`MIQROKEY_RETENTION_MAX_TEXT_CHARS`，单请求用户文本上限，超限跳过+计数）。采集面由控制面 `retention_config`（管理 API §5.26）逐租户开关并经路由快照下发；无 crypto 或 publisher 时 fail-closed。
+
 ## 7. Webhook 与告警
 
 | 配置 | 默认 | 说明 |
