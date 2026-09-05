@@ -134,16 +134,16 @@ onMounted(load);
   <div class="ui-page next-overview">
     <header class="ui-page-header">
       <div>
-        <h1 class="ui-page-title">{{ auth.user?.displayName ?? auth.user?.username }}，欢迎回来</h1>
+        <h1 class="ui-page-title">总览</h1>
         <p class="ui-page-desc">
-          内部凭证治理控制台 · 单租户部署 · {{ new Date().getFullYear() }} 年
+          Virtual Key、用量与成本的关键指标——数据来自网关逐笔记账，与明细页口径一致。
         </p>
       </div>
       <div class="ui-page-actions">
         <UiButton
           variant="primary"
           data-testid="overview-create-key"
-          @click="$router.push('/app-new/keys')"
+          @click="$router.push('/app/keys')"
         >
           创建 Virtual Key
         </UiButton>
@@ -180,7 +180,7 @@ onMounted(load);
         <section class="ui-panel" data-testid="overview-usage">
           <div class="ui-panel-head">
             <h2 class="ui-panel-title">用量分布（按项目）</h2>
-            <router-link to="/app-new/usage" class="next-overview__link">查看明细</router-link>
+            <router-link to="/app/usage" class="next-overview__link">查看明细</router-link>
           </div>
           <div class="ui-panel-body">
             <div v-if="usageBars.length" class="next-overview__bars">
@@ -228,7 +228,7 @@ onMounted(load);
         <section class="ui-panel" data-testid="overview-keys">
           <div class="ui-panel-head">
             <h2 class="ui-panel-title">最近创建的 Key</h2>
-            <router-link to="/app-new/keys" class="next-overview__link">全部 Key</router-link>
+            <router-link to="/app/keys" class="next-overview__link">全部 Key</router-link>
           </div>
           <div v-if="recentKeys.length" class="next-overview__recent">
             <div v-for="key in recentKeys" :key="key.id" class="next-overview__key-row">
@@ -260,7 +260,7 @@ onMounted(load);
           </div>
           <div v-else class="next-overview__recent-empty">
             <p class="next-overview__empty">还没有 Virtual Key。</p>
-            <router-link to="/app-new/keys" class="next-overview__link">创建一个</router-link>
+            <router-link to="/app/keys" class="next-overview__link">创建一个</router-link>
           </div>
         </section>
       </div>

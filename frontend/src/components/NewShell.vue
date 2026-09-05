@@ -98,14 +98,16 @@ const opsNav: NavItem[] = [
 
 const isAdmin = computed(() => auth.user?.role === 'SYSTEM_ADMIN');
 
-/** "数据与告警 / Webhook 端点" style trail for the topbar (Vben-like chrome). */
+/** "数据与告警 / Webhook 端点" style trail for the topbar (Vben-like chrome).
+ *  Only grouped (admin) pages show a trail; ungrouped regular pages carry
+ *  their own page title and a trail would just duplicate it. */
 const breadcrumb = computed(() => {
   const name = route.name as string | undefined;
   if (!name) return '';
   for (const group of navGroups.value) {
     const item = group.items.find((i) => i.name === name);
     if (item) {
-      return group.title ? `${group.title} / ${item.label}` : item.label;
+      return group.title ? `${group.title} / ${item.label}` : '';
     }
   }
   return '';
