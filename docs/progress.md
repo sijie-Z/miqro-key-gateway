@@ -6,8 +6,8 @@
 
 - Project phase: `PHASE_1`
 - Current executor: `Claude Code`
-- Current goal: `会话执行 2026-09-06（夜间自主轮：UI Vben 母版重塑，分支 goal/ui-vben-2026-09-06）` — `IN_PROGRESS`（本轮记录见下方「会话交接点 2026-09-06」段；队列总纲仍见 docs/session-handoff-2026-09-05.md + NEXT_SESSION_PLAN.md）
-- Goal status: `IN_PROGRESS`（develop @ a867d76 = #172 ADR-0014 R2。2026-09-05→06 已并入：#169 docs 轮、#170 ADR-0012/0014 Accepted + trivyignore、#171 R1 配置面、#172 R2 网关侧信道。**待办：Q4 真机 https 冒烟、Q5 UI（2026-09-06 已按 owner 指令把母版从 PostHog 修订为 Vben Admin console 族，进行中）、R3/R4 Kafka producer/consumer 参考实现（ADR-0014 范围）、Q7 等拍板、Q6 stage2 残余 spec 缺口**）
+- Current goal: `会话执行 2026-09-06（夜间自主轮：UI Vben 母版重塑 + ADR-0014 R3/R4）` — `IN_PROGRESS`（本轮记录见下方「会话交接点 2026-09-06」段；队列总纲仍见 docs/session-handoff-2026-09-05.md + NEXT_SESSION_PLAN.md）
+- Goal status: `IN_PROGRESS`（develop @ 96a4ce0 = #175。本夜已并入：#173 UI Vben console edition（母版修订 v3，frontend-design.md 同步）、#174 overview cost 空态 followup、#175 R3 Kafka producer（Redpanda IT 全绿）。**待办：Q4 真机 https 冒烟、R4 消费端参考（本批在途：docs/retention-consumer.md + scripts/retention/consumer-file-ref.py）、keys/overview 残余页级、Q7 Kafka 拓扑/发布等拍板、Q6 stage2 残余 spec 缺口**）
 - Last updated: `2026-09-06 CST`
 
 ## 会话交接点 2026-09-06 — UI 母版修订(Vben console edition)与夜间自主轮
@@ -18,6 +18,17 @@
 - **验证（全部真实 PASS）**：typecheck、vitest 154/154、build、eslint（改动文件 0 error）、审美审计。
 - **素材**：vben demo 截图+规格转写与 4 页基线分等全部在 miqro-local/ui-reviews/2026-09-06/ 与 worknotes/。
 - **残余（后续轮）**：NextOverviewView 页级收口、keys 页级（掩码/列宽）、e2e 金样刷新、frontend-design.md 已在本轮修订（见下）视觉基线存档轮。
+
+### R3 Kafka producer（#175，2026-09-06 合入，DONE）
+- 标准 Kafka 协议投递留痕信封到 `content-retention` topic（默认）；记录键 = SHA-256(tenant/user)（同用户恒同分区保序）；信封 JSON 显式字段、ciphertext/nonce base64、明文永不出网关；发送异步、失败节流计数（消费者按 eventId 幂等容忍重放）。
+- 装配：`KafkaRetentionConfig` @ConditionalOnProperty `miqrokey.retention.kafka.bootstrap-servers` + @Primary 替换 no-op（默认仍 fail-closed）；kafka-clients 版本 Boot BOM 管理（3.8.1）；测试依赖 org.testcontainers:redpanda。
+- 验证：单测 2/2（payload 字段/base64 语义、partition key 稳定性）+ **Redpanda 容器端到端 1/1**（真实 broker 收信两封、key=partitionKey、同分区、密文不透明文、dropped=0；本机 33s 通过；CI Backend integration 亦绿）+ CI 9/9 全绿（spotless pom 格式修正后）。
+- 排障：3.8.1 无 flush(Duration)（只有 flush() + close(Duration)）；testcontainers redpanda 模块要求 docker.redpanda.com 官方镜像全名；分支乱序教训（verify 跑动中不动文件、pom 跨分支漂移、dispatch 后 commit 需重发）。
+- 配置/文档：configuration-reference §6 R3 行；CHANGELOG；ADR-0014 无改动（范围内落地）。
+
+### R4 消费端参考实现（本批，REFERENCE）
+- `docs/retention-consumer.md`：消费端契约（topic/键语义/at-least-once+eventId 幂等/保序）、信封 JSON schema 表、解密说明（AES-GCM + RETENTION_AAD_ID 合成常量 + keyVersion）、本地文件布局 `<root>/<tenant>/<user>/<YYYY-MM-DD>.jsonl`、对象存储/DB 适配要点、冒烟链路。
+- `scripts/retention/consumer-file-ref.py`（+requirements.txt）：单文件 kafka-python 参考消费者——批量落盘后手动 commit、eventId 去重（内存 + 启动扫描既有文件）、优雅退出；--dry-run 联调。逻辑冒烟 PASS（去重/按日滚动/重启 reseed）；kafka 依赖按需安装，不进入产品构建。
 ## 会话交接点 2026-09-03 — UI 专项 U0 待验收（用户 2026-09-03 拍板：PostHog 视觉母版 + Vben 布局参考；U0 验收通过前暂停功能 backlog）
 
 ### U0 待办（下一动作，只等用户）
