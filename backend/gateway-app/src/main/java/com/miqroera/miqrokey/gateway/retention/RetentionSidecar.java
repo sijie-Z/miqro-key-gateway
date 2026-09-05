@@ -125,6 +125,11 @@ public final class RetentionSidecar {
         return dropped.get();
     }
 
+    /** Drains the queue into the publisher synchronously (tests). */
+    void flushNow() {
+        flush();
+    }
+
     private boolean offer(RetentionEnvelope envelope) {
         return queue.offer(envelope);
     }

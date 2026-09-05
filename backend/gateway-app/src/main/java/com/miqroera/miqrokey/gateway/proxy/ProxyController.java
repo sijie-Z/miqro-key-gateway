@@ -13,6 +13,7 @@ import com.miqroera.miqrokey.domain.usage.RequestStatus;
 import com.miqroera.miqrokey.domain.usage.TokenBucket;
 import com.miqroera.miqrokey.domain.usage.UsageEvent;
 import com.miqroera.miqrokey.domain.security.UpstreamTargetValidator;
+import com.miqroera.miqrokey.gateway.retention.RetentionSidecar;
 import com.miqroera.miqrokey.gateway.vkey.AuthContext;
 import com.miqroera.miqrokey.domain.route.RouteSnapshot;
 import com.miqroera.miqrokey.adapters.catalog.ProviderCatalog;
@@ -134,6 +135,7 @@ public class ProxyController {
     private final Scheduler credentialDecryptScheduler;
     private final BuiltInAdapterRegistry adapterRegistry;
     private final ProviderCatalog providerCatalog;
+    private final RetentionSidecar retentionSidecar;
 
     public ProxyController(VirtualKeyResolver keyResolver, CredentialInjector credentialInjector,
             GatewayResponseCache responseCache, ObjectProvider<RequestCoalescer> coalescerProvider,
@@ -141,7 +143,9 @@ public class ProxyController {
             CacheKeyFactory cacheKeyFactory, SseReplayEngine sseReplayEngine, WebClient proxyWebClient, Clock clock,
             ObjectMapper objectMapper, ProxyTargetProperties properties,
             UpstreamTargetValidator upstreamTargetValidator, Scheduler credentialDecryptScheduler,
-            BuiltInAdapterRegistry adapterRegistry, ProviderCatalog providerCatalog) {
+            BuiltInAdapterRegistry adapterRegistry, ProviderCatalog providerCatalog,
+            RetentionSidecar retentionSidecar) {
+        this.retentionSidecar = retentionSidecar;
         this.keyResolver = keyResolver;
         this.credentialInjector = credentialInjector;
         this.responseCache = responseCache;
@@ -225,6 +229,9 @@ public class ProxyController {
     private Mono<Void> handleAuthenticated(ServerWebExchange exchange, AuthContext ctx, String requestId,
             long startMillis) {
         return bufferBody(exchange).flatMap(body -> {
+            // Compliance retention side-channel (ADR-0014, default off):
+            // best-effort, never affects the forwarded outcome.
+            retentionSidecar.capture(exchange.getRequest().getPath().value(), body, ctx, requestId);
             JsonNode root = parseQuietly(body);
             String modelName = root != null && root.has("model") && root.get("model").isTextual()
                     ? root.get("model").asText()
