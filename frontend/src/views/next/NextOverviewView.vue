@@ -66,7 +66,8 @@ const costGroups = computed(() =>
       label: g.label,
       cost: Number(g.cost?.upstreamPaid ?? 0),
     }))
-    .filter((g) => g.cost > 0)
+    // hide sub-cent noise so a ~¥0 total never renders a full-width bar
+    .filter((g) => g.cost >= 0.005)
     .sort((a, b) => b.cost - a.cost)
     .slice(0, 8),
 );
@@ -248,12 +249,16 @@ onMounted(load);
       </div>
 
       <!-- Cost distribution (full-width panel; ties usage numbers to money) -->
-      <section v-if="costGroups.length" class="ui-panel next-overview__panel" data-testid="overview-cost">
+      <section
+        v-if="costGroups.length"
+        class="ui-panel next-overview__panel"
+        data-testid="overview-cost"
+      >
         <div class="ui-panel-head">
           <h2 class="ui-panel-title">成本分布（按项目）</h2>
           <span class="ui-panel-sub">上游实付合计 · ¥{{ costTotal.toFixed(2) }}</span>
         </div>
-        <div class="ui-panel-body">
+        <div v-if="costTotal > 0" class="ui-panel-body">
           <div class="next-overview__cost-grid">
             <div v-for="group in costGroups" :key="group.label" class="next-overview__cost-row">
               <span class="next-overview__cost-label" :title="group.label">{{
@@ -262,15 +267,17 @@ onMounted(load);
               <div class="next-overview__cost-track">
                 <div
                   class="next-overview__cost-fill"
-                  :style="{ width: `${Math.max(2, (group.cost / (costTotal || 1)) * 100)}%` }"
+                  :style="{ width: `${Math.max(2, (group.cost / costTotal) * 100)}%` }"
                 />
               </div>
               <span class="next-overview__cost-value ui-num"
-                >¥{{ group.cost.toFixed(2) }} ·
-                {{ ((group.cost / (costTotal || 1)) * 100).toFixed(0) }}%</span
+                >¥{{ group.cost.toFixed(2) }} · {{ ((group.cost / costTotal) * 100).toFixed(0) }}%</span
               >
             </div>
           </div>
+        </div>
+        <div v-else class="ui-panel-body">
+          <p class="next-overview__empty">暂无成本记录。</p>
         </div>
       </section>
 
