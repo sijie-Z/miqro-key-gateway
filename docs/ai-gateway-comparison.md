@@ -75,3 +75,26 @@
 
 - **腾讯/阿里适合**：多模型供应商并存、需要弹性与智能调度的云上企业。
 - **MiQroGate 适合**：单客户私有化、需要「每笔流量可审计、每分钱可对账」的确定性治理场景——尤其是把公司内部的 AI 编码流量（Claude Code / Codex 等经 CC Switch）纳入统一凭证与额度管控。
+
+## 补充：阿里云侧新情报（2026-09-06 研究，对照百炼/Token Plan/AI 网关 FinOps 与 Higress）
+
+> 素材：百炼 Token Plan 概述（alibabacloud.com/help/model-studio/token-plan-overview）、百炼限流（help/model-studio/rate-limit）、阿里云 API 网关 AI 网关发布记录（help.aliyun.com/zh/api-gateway/ai-gateway）、Higress AI Gateway 官方（higress.cn/ai-gateway 与 higress.io/en/ai-gateway）及社区综述。只做研究对照，未改产品决策。
+
+**对使用方有直接价值的运营事实（写入 runbook 候选）**：
+1. **Key 区域绑定与多形态端点**：百炼按量 `sk-*` Key 与 Coding/Token Plan `sk-sp-*` Key 走不同 Base URL；Key 区域绑定，跨区域调用报 InvalidApiKey。**订阅 Key 若透传到网关走按量 URL 会静默按量扣费且订阅看板零消耗**——CC Switch/网关配置文档应提醒用户区分（我们已按产品目录锁定端点，但上游 Key 类型误配仍可能发生，凭证指纹校验与 400/401 归因已在验证流程内）。
+2. **用量可见性 T+1**：百炼「模型监控」调用统计约一小时后可见——与我们的本地即时记账形成对账窗口差异；对账/水位的「官方值滞后」在文档中已有口径，此点可强化备注。
+3. **429/403 语义**：RPM/TPM 超限 → 429（一分钟内自恢复）；免费额度用完（用完即停）→ 403。与网关上游错误归因文档兼容。
+
+**功能形态对照（映射/不采纳）**：
+| 阿里云形态 | 我们对应/裁决 |
+|---|---|
+| AI 网关 FinOps：消费者 Token/Credits 配额，周期=日/周/月/年 + 自定义 + 时区 + 水位监控；消费者组 + API 授权；模型资产 Credits 配额管控 | 对应我们配额规则（USER/PROJECT 作用域、TOKENS/REQUESTS、DAILY/WEEKLY/MONTHLY、水位+告警不阻断）。**不采纳**：Credits 归一化单位（跨供应商换算引入估算语义）、年/自定义周期（内部 50 账号无此需求）、消费者组（无组实体）、配额硬阻断（锁定决策：只告警） |
+| Higress 语义缓存（Embedding+向量库，宣称省 40-60%） | 与 ADR-0009 方向一致但**刻意不采纳向量库形态**（零中间件 + 不引正文特征化）；我们语义键=末条 user 消息哈希（腾讯/阿里精确缓存同源思路的轻量版） |
+| Higress 多 Key 均衡/Key 池轮询 | **刻意不采纳**（1:1 固定绑定；Key 池轮询破坏审计映射） |
+| Higress 模型 Fallback/降级链 | 刻意不采纳（不自动故障切换） |
+| Higress MCP 托管/HTTP↔MCP 转换（唯一原生内置 MCP Server 的网关对比点） | MCP 代理按 ADR-0013 已落地（我们的范围=本网关出口的 MCP 服务代理与 ACL/韧性），HTTP-to-MCP 转换留给 CC Switch/平台侧 |
+| Higress KMS 密钥集成、请求侧加密脱敏 | 对位=我们的 AES-256-GCM 信封加密 + ADR-0014 密文留痕（默认关）；KMS 集成不在私有化默认范围 |
+| Higress Token 限流（Redis 令牌桶） | 刻意不采纳（不限流，只告警；零中间件） |
+| 百炼不支持 OpenAI `GET /models`，需手动填模型 ID | 佐证我们 `/v1/models` 按 Virtual Key 授权返回模型的决策价值（真实消费者需要它） |
+
+**结论增量**：三家把「治理能力」越做越厚的同时，我们差异化的三根支柱（不碰正文/1:1 绑定/只告警不阻断）依旧成立；阿里侧新增的观察点只有两个**运营提醒**（Key 形态误配扣费、官方用量 T+1），不构成功能立项。
