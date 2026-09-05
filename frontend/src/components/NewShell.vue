@@ -304,8 +304,8 @@ async function handleLogout() {
 }
 
 .new-shell__group-title {
-  margin: var(--ui-space-5) var(--ui-space-2) var(--ui-space-2);
-  font-size: 11px;
+  margin: var(--ui-space-4) var(--ui-space-2) var(--ui-space-1);
+  font-size: 12px;
   font-weight: var(--ui-weight-semibold);
   letter-spacing: 0.05em;
   text-transform: uppercase;

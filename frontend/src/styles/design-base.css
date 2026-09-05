@@ -14,7 +14,7 @@
 
 .ui-page-header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: var(--ui-space-4);
   margin-bottom: var(--ui-space-6);
